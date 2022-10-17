@@ -2,9 +2,10 @@
   "compilerOptions": {
     "target": "es2016",
     "lib": ["es6"],
-    "module": "commonjs",
+    "module": "ES2015",
     "rootDir": "src",
-    "resolveJsonModule": true,
+    "resolveJsonModule": false,
+    "moduleResolution": "node",
     "allowJs": true,
     "outDir": "build",
     "esModuleInterop": true,
