@@ -1,6 +1,8 @@
 import { ErrorHandler } from './middlewares/errorHandler';
 import express, { NextFunction, Request, Response } from 'express';
 import { corsOptions, credentials } from './utils/corsConfig';
+import { ErrorHandler } from './middlewares/errorHandler';
+import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import cors from 'cors';
@@ -10,6 +12,7 @@ const app = express();
 // middlewares
 app.use(helmet());
 app.use(morgan('dev'));
+app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(credentials);
 
