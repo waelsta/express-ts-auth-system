@@ -1,4 +1,3 @@
-import { ErrorHandler } from './middlewares/errorHandler';
 import express, { NextFunction, Request, Response } from 'express';
 import { corsOptions, credentials } from './utils/corsConfig';
 import { ErrorHandler } from './middlewares/errorHandler';
