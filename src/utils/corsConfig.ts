@@ -1,20 +1,21 @@
 import { NextFunction, Request, Response } from 'express';
+const PORT = process.env.PORT;
 
 // allowed origins
 export const allowedOrigins = [
-  'https://www.yoursite.com',
-  'http://127.0.0.1:3000',
-  'http://localhost:3000'
+  // 'https://www.yoursite.com',
+  `http://127.0.0.1:${PORT}`,
+  `http://localhost:${PORT}`,
+  `localhost:${PORT}`
 ];
 
 // Allow Credentials for allowed origins
-
 export const credentials = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const origin = req.headers.origin;
+  const origin = req.headers.host;
   if (typeof origin == 'string') {
     if (allowedOrigins.includes(origin)) {
       res.header('Access-Control-Allow-Credentials', 'true');
@@ -23,6 +24,7 @@ export const credentials = (
   }
 };
 
+// allow only specific origins
 export const corsOptions = {
   origin: function (origin: any, callback: any) {
     if (allowedOrigins.indexOf(origin) !== -1 || !origin) {

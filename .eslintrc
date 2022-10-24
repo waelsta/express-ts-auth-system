@@ -10,7 +10,7 @@
   ],
   "ignorePatterns": ["/build", "/tests", "node_modules"],
   "rules": {
-    "no-console": "warn",
+    // "no-console": "warn",
     "curly": ["error", "multi-line"],
     "quotes": [
       "error",
