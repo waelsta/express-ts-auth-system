@@ -11,8 +11,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+model Client {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
+  email        String   @unique
+  first_name   String
+  last_name    String
+  city         String
+  street       String
+  phone_number Int      @unique
+  is_client    Boolean
+  password     String
+}
+
+model Employee {
+  id             Int      @id @default(autoincrement())
+  createdAt      DateTime @default(now())
+  first_name     String
+  last_name      String
+  cv_url         String
+  profession     String
+  phone_number   String   @unique
+  email          String   @unique
+  still_employed Boolean
+  coordinates    String?
 }

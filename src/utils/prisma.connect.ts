@@ -8,7 +8,7 @@ export async function connectToDatabase() {
     .$connect()
     .then(
       () => console.log('connected to postgresql 🐘✨'),
-      (err) => console.log('could not connect to postgresql 🛟' ,err)
+      err => console.log('could not connect to postgresql 🛟', err)
     )
     .catch(err => console.log('error connecting to database', err));
 }
