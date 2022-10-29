@@ -1,4 +1,3 @@
-import { CustomError } from '../middlewares/errorHandler';
 import redisClient from '../utils/redis.connect';
 import prisma from '../utils/prisma.connect';
 import { Client } from '@prisma/client';
@@ -17,29 +16,15 @@ export const phoneNumberExists = async (phone: number) => {
 
 // insert user into database ;
 export const createClient = async (client: Client) => {
-  try {
-    const clientData = await prisma.client.create({ data: client });
-    return clientData;
-  } catch (error: any) {
-    if (process.env.node_env === 'DEVELOPMENT') {
-      throw new CustomError(400, error.message);
-    } else {
-      throw new CustomError(400, 'there was an error signing in !');
-    }
-  }
+  const clientData = await prisma.client.create({ data: client });
+  return clientData;
 };
 
 export const saveSession = async (client: Client) => {
-  try {
-    const clientSession = await redisClient.set(
-      randomUUID(),
-      JSON.stringify(client)
-    );
-
-    return clientSession;
-  } catch (error: any) {
-    if (process.env.node_env === 'DEVELOPMENT') {
-      throw new CustomError(400, error.message);
-    } else throw new CustomError(400, 'there was an error signing in !');
-  }
+  const sessionKey = randomUUID();
+  const clientSession = await redisClient.set(
+    sessionKey,
+    JSON.stringify(client)
+  );
+  return clientSession;
 };

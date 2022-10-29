@@ -12,7 +12,7 @@ datasource db {
 }
 
 model Client {
-  id           Int      @id @default(autoincrement())
+  id           String   @id
   createdAt    DateTime @default(now())
   email        String   @unique
   first_name   String
@@ -20,7 +20,7 @@ model Client {
   city         String
   street       String
   phone_number Int      @unique
-  is_client    Boolean
+  is_client    Boolean  @default(false)
   password     String
 }
 

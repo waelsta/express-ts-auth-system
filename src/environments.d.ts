@@ -1,8 +1,11 @@
+import { Secret } from 'jsonwebtoken';
+
 export {};
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
-      JWT_SECRET: string;
+      JWT_SECRET: Secret;
+      REFRESH_SECRET: Secret;
     }
   }
 }

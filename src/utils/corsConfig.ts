@@ -3,10 +3,11 @@ const PORT = process.env.PORT;
 
 // allowed origins
 export const allowedOrigins = [
-  // 'https://www.yoursite.com',
   `http://127.0.0.1:${PORT}`,
   `http://localhost:${PORT}`,
-  `localhost:${PORT}`
+  `localhost:${PORT}`,
+  `http://localhost:7000`,
+  `localhost:7000`
 ];
 
 // Allow Credentials for allowed origins

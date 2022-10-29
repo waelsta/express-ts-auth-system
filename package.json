@@ -11,7 +11,8 @@
     "start:dev": "nodemon",
     "build": "rimraf ./build && tsc",
     "start:prod": "npm run build && node build/server.js",
-    "test": "jest --watchAll "
+    "test": "jest --watchAll ",
+    "test-compose": "docker compose up -d && docker exec -it api npm test"
   },
   "keywords": [],
   "author": "",
@@ -56,6 +57,7 @@
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
     "prisma": "^4.5.0",
-    "redis": "^4.3.1"
+    "redis": "^4.3.1",
+    "yup": "^0.32.11"
   }
 }
