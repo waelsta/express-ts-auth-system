@@ -21,16 +21,17 @@ app.get('/', (req, res) => {
   return res.status(200).send({ message: 'hello world' });
 });
 
-app.use('/api/auth', authRouter);
+app.use('/api/v1/auth', authRouter);
 
-app.use('*', (req: Request, res: Response, next: NextFunction) => {
-  return next(new CustomError(404, 'endpoint does not exist'));
-});
+// app.use('*', (req: Request, res: Response, next: NextFunction) => {
+//   return next(new CustomError(404, 'endpoint does not exist'));
+// });
 
 // express error handler
-app.use((err: ErrorHandler, req: Request, res: Response) => {
-  res.status(err.statusCode);
-  return res.send({ error: err.message });
-});
+app.use(
+  (err: ErrorHandler, req: Request, res: Response, next: NextFunction) => {
+    return res.status(err.statusCode).send({ error: err.message });
+  }
+);
 
 export default app;

@@ -38,6 +38,11 @@ export type SignupFormTypes = {
   city: string;
 };
 
+export type SigninFormTypes = {
+  email: string;
+  password: string;
+};
+
 export const userSignUpSchema = yup.object().shape({
   first_name: yup.string().min(3, 'minimum length is 3').required(),
   last_name: yup.string().min(3, 'minimum length is 3').required(),
@@ -92,5 +97,34 @@ export const userSignUpSchema = yup.object().shape({
         return false;
       }
     })
+    .required()
+});
+
+export const userSignInSchema = yup.object().shape({
+  email: yup
+    .string()
+    .test('isValidEmail', 'please enter a valid email', value => {
+      if (typeof value === 'string') {
+        const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$/;
+        return emailRegex.test(value);
+      }
+      return false;
+    })
+    .required(),
+  password: yup
+    .string()
+    .min(8, 'minimum number of characters is 8')
+    .test(
+      'isValidPassword',
+      'Minimum eight characters, at least one letter and one number',
+      async value => {
+        if (typeof value === 'string') {
+          const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+          const found = passwordRegex.test(value);
+          return found;
+        }
+        return false;
+      }
+    )
     .required()
 });

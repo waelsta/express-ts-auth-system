@@ -15,7 +15,7 @@ const signupTestData = {
   city: 'beja'
 };
 
-describe('it should sign up', () => {
+describe('auth', () => {
   let server: http.Server;
 
   beforeAll(async () => {
@@ -24,15 +24,40 @@ describe('it should sign up', () => {
     await prisma.client.delete({ where: { email: signupTestData.email } });
     server = http.createServer(app).listen(7000);
   });
+  describe('sign up', () => {
+    it('should register client', () => {
+      return request(server)
+        .post('/api/v1/auth/signup')
+        .send(signupTestData)
+        .expect(200)
+        .then(res => {
+          expect(res.body).toHaveProperty('data');
+        });
+    });
+  });
 
-  it('should register client', () => {
-    return request(server)
-      .post('/api/auth/signup')
-      .send(signupTestData)
-      .expect(200)
-      .then(res => {
-        expect(res.body).toHaveProperty('token');
-      });
+  describe('sign in', () => {
+    //invalid credentials
+    it('should return invalid credentials', () => {
+      return request(server)
+        .post('/api/v1/signin')
+        .send({ email: 'khalil@gmail.com', password: 'khlayla' })
+        .expect(300);
+    });
+    //email is taken
+    it('should return email already in use', () => {
+      return request(server)
+        .post('api/v1/signin')
+        .send({ email: 'khalil@gmail.com', password: 'password' })
+        .expect(300);
+    });
+    // signed in success
+    it('should return sign in success', () => {
+      return request(server)
+        .post('api/v1/signin')
+        .send({ email: 'khalil@gmail.com', password: 'khalilcher666' })
+        .expect(200);
+    });
   });
 
   afterAll(done => {

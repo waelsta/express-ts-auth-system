@@ -33,6 +33,7 @@ model Employee {
   profession     String
   phone_number   String   @unique
   email          String   @unique
+  password       String
   still_employed Boolean
   coordinates    String?
 }
