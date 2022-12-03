@@ -1,16 +1,14 @@
-import { CustomError, ErrorHandler } from './middlewares/errorHandler';
+import { ErrorHandler } from './middlewares/errorHandler';
 import express, { NextFunction, Request, Response } from 'express';
 import { corsOptions, credentials } from './utils/corsConfig';
 import authRouter from './routes/authRouter';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
-import morgan from 'morgan';
 import cors from 'cors';
 
 const app = express();
 // middlewares
 app.use(helmet());
-app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(credentials);
@@ -23,11 +21,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/auth', authRouter);
 
-// app.use('*', (req: Request, res: Response, next: NextFunction) => {
-//   return next(new CustomError(404, 'endpoint does not exist'));
-// });
 
-// express error handler
 app.use(
   (err: ErrorHandler, req: Request, res: Response, next: NextFunction) => {
     return res.status(err.statusCode).send({ error: err.message });

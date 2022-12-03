@@ -3,24 +3,18 @@ import prisma from '../utils/prisma.connect';
 import { Client, Employee } from '@prisma/client';
 
 import { randomUUID } from 'crypto';
+import { ISessionClientData } from '../utils/validation';
 
 // check for existing email
-export const emailExists = async (userType: string, email: string) => {
-  switch (userType) {
-    case 'Client':
-      const client = await prisma.client.findUnique({
-        where: { email }
-      });
-      return client;
-    case 'Employee':
-      const employee = await prisma.employee.findUnique({
-        where: { email }
-      });
-      return employee;
-    default:
-      return null;
-  }
-};
+export const findClientByEmail = async (email: string) =>
+  await prisma.client.findUnique({
+    where: { email }
+  });
+
+export const findEmployeeByEmail = async (email: string) =>
+  await prisma.employee.findUnique({
+    where: { email }
+  });
 
 // check for existing phone number
 export const phoneNumberExists = async (phone: number) => {
@@ -33,7 +27,9 @@ export const createClient = async (client: Client) => {
   return clientData;
 };
 
-export const saveSession = async (user: Client | Employee) => {
+export const saveSession = async (
+  user: ISessionClientData | Employee | Client
+) => {
   const sessionKey = randomUUID();
   await redisClient.set(sessionKey, JSON.stringify(user), {
     EX: parseInt(process.env.SESSION_EXP as string)
