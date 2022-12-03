@@ -21,7 +21,6 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/auth', authRouter);
 
-
 app.use(
   (err: ErrorHandler, req: Request, res: Response, next: NextFunction) => {
     return res.status(err.statusCode).send({ error: err.message });

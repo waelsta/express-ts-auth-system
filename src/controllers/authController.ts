@@ -71,7 +71,7 @@ export async function signup(
   }
 
   // user Object - hashed password !
-  let sessionData = {
+  const sessionData = {
     phone_number: req.body.phone_number,
     first_name: req.body.first_name,
     last_name: req.body.last_name,
@@ -84,7 +84,7 @@ export async function signup(
     is_client: false
   };
 
-  let clientData = {
+  const clientData = {
     ...sessionData,
     password: hashPassword(req.body.password),
     phone_number: parseInt(req.body.phone_number)
@@ -137,16 +137,16 @@ export async function signin(req: Request, res: Response, next: NextFunction) {
   }
 
   const emailExist = await findClientByEmail(req.body.email);
-  if (!emailExist)
+  if (!emailExist) {
     return next(
       new CustomError(StatusCodes.BAD_REQUEST, 'invalid credentials !')
     );
+  }
 
   // verify password
   if (verifyPassword(req.body.password, emailExist.password)) {
     //get full user data and save to redis session
-    let sessionKey;
-    sessionKey = await saveSession(emailExist);
+    const sessionKey = await saveSession(emailExist);
 
     //sign and send jwt
     const token = signToken(sessionKey);
