@@ -154,12 +154,10 @@ describe('Auth', () => {
     });
   });
 
-    // signout success
-    it('should return signout success', ()=>{
-      return request(server)
-        .post('/api/v1/auth/client/signout')
-        .expect(204);
-    })
+  // signout success
+  it('should return signout success', () => {
+    return request(server).post('/api/v1/auth/client/signout').expect(204);
+  });
 
   afterAll(async () => {
     await prisma.client.deleteMany({ where: { email: 'test1@mail.com' } });

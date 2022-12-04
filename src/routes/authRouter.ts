@@ -1,6 +1,6 @@
 import express from 'express';
 import { signup, signin } from '../controllers/authController';
-import {signout} from '../controllers/signoutController'
+import { signout } from '../controllers/signoutController';
 const authRouter = express.Router();
 
 authRouter.route('/client/signup').post(signup);
