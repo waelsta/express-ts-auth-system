@@ -16,6 +16,7 @@ import {
   createClient,
   phoneNumberExists
 } from '../models/authModels';
+import redisClient from '../utils/redis.connect';
 
 const validateFormData = async (
   formValues: ISignupFormTypes | ISigninFormTypes,
@@ -161,3 +162,4 @@ export async function signin(req: Request, res: Response, next: NextFunction) {
     );
   }
 }
+ 
