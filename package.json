@@ -12,9 +12,9 @@
     "build": "rimraf ./build && tsc",
     "start:prod": "npm run build && node build/server.js",
     "test:jest": "jest --watchAll --runInBand",
-    "test:buildEnv" : "docker compose -f docker-compose.test.yml up -d" ,
-    "test:removeEnv" : "docker compose -f docker-compose.test.yml down" ,
-    "test": "npm run test:buildEnv && docker exec -it api npm run test:jest && npm run test:removeEnv"
+    "test:buildEnv": "docker compose -f docker-compose.test.yml up -d",
+    "test:removeEnv": "docker compose -f docker-compose.test.yml down",
+    "test": "npm run test:buildEnv && docker exec -it api-test npx prisma migrate dev && docker exec -it api-test npm run test:jest && npm run test:removeEnv"
   },
   "keywords": [],
   "author": "",

@@ -4,21 +4,21 @@ services:
   api-test:
     restart: always
     container_name: api-test
-    command: "npm run start:dev"
+    command: "tail -F someFile" # keep container running
     build:
       context: ./
       target: dev-bind
     environment:
       - ENV=DEVELOPMENT
       - PORT=5000
-      - DATABASE_URL=postgresql://admin:123@psql-db:5432/service
-      - REDIS_URL=redis://redis
+      - DATABASE_URL=postgresql://admin:123@psql-test-db:5432/service
+      - REDIS_URL=redis://redis-test
     volumes:
       - .:/app
     ports:
       - 7000:7000
     networks:
-      - app-test-volume
+      - app-test-network
     depends_on:
       - adminer-test
   psql-test-db:
@@ -34,7 +34,7 @@ services:
     volumes:
       - db-test-volume:/var/lib/postgresql/data
     networks:
-      - app-test-volume
+      - app-test-network
 
   redis-test:
     container_name: redis-test
@@ -43,7 +43,7 @@ services:
     ports:
       - 6379
     networks:
-      - app-test-volume
+      - app-test-network
   adminer-test:
     container_name: adminer-test
     image: adminer
@@ -51,12 +51,12 @@ services:
     ports:
       - 8081:8081
     networks:
-      - app-test-volume
+      - app-test-network
     depends_on:
       - psql-test-db
 
 networks:
-  app-test-volume:
+  app-test-network:
 
 
 volumes:
