@@ -217,6 +217,38 @@ describe('Auth', () => {
     });
   });
 
+  describe('reset link', () => {
+    it('should return missing email', async () => {
+      return request(server)
+        .post('/api/v1/auth/client/link')
+        .expect(StatusCodes.BAD_REQUEST)
+        .then(res => {
+          expect(res.body).toMatchObject({
+            error: 'missing email address !'
+          });
+        });
+    });
+
+    it('should return no user with such email', async () => {
+      return request(server)
+        .post('/api/v1/auth/client/link')
+        .send({ email: 'invlidmail@gmail.com' })
+        .expect(StatusCodes.BAD_REQUEST)
+        .then(res => {
+          expect(res.body).toMatchObject({
+            error: 'no user with such email !'
+          });
+        });
+    });
+
+    it('should return OK', async () => {
+      return request(server)
+        .post('/api/v1/auth/client/link')
+        .send({ email: 'test1@mail.com' })
+        .expect(StatusCodes.OK);
+    }, 20000);
+  });
+
   afterAll(async () => {
     await prisma.client.deleteMany({ where: { email: 'test1@mail.com' } });
     await prisma.client.deleteMany({ where: { email: 'test2@mail.com' } });

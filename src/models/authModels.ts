@@ -1,6 +1,7 @@
 import redisClient from '../utils/redis.connect';
 import prisma from '../utils/prisma.connect';
 import { Client, Employee } from '@prisma/client';
+import mailer from 'nodemailer';
 
 import { randomUUID } from 'crypto';
 import { ISessionClientData } from '../utils/validation';
@@ -35,4 +36,23 @@ export const saveSession = async (
     EX: parseInt(process.env.SESSION_EXP as string)
   });
   return sessionKey;
+};
+
+export const sendMail = async (to: string, subject: string, body: string) => {
+  const transport = mailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.MAIL_USER,
+      pass: process.env.MAIL_PASSWORD
+    }
+  });
+
+  const mailOptions = {
+    from: process.env.MAIL_USER,
+    to: to,
+    subject: subject,
+    text: body
+  };
+
+  return await transport.sendMail(mailOptions);
 };

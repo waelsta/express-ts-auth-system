@@ -7,15 +7,17 @@ import {
 import { hashPassword, verifyPassword } from '../utils/crypt';
 import { CustomError } from '../middlewares/errorHandler';
 import { NextFunction, Request, Response } from 'express';
-import { randomUUID } from 'crypto';
+import { randomBytes, randomUUID } from 'crypto';
 import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 import {
   saveSession,
   findClientByEmail,
   createClient,
-  phoneNumberExists
+  phoneNumberExists,
+  sendMail
 } from '../models/authModels';
+import redisClient from '../utils/redis.connect';
 
 const validateFormData = async (
   formValues: ISignupFormTypes | ISigninFormTypes,
@@ -161,3 +163,71 @@ export async function signin(req: Request, res: Response, next: NextFunction) {
     );
   }
 }
+
+// send reset code
+export const getResetLink = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // no email address
+  if (!req.body.email) {
+    return next(
+      new CustomError(StatusCodes.BAD_REQUEST, 'missing email address !')
+    );
+  }
+
+  // email does not exists
+  let email;
+  try {
+    email = await findClientByEmail(req.body.email);
+    if (!email) {
+      return next(
+        new CustomError(StatusCodes.BAD_REQUEST, 'no user with such email !')
+      );
+    }
+  } catch {
+    return next(
+      new CustomError(StatusCodes.BAD_REQUEST, 'no user with such email !')
+    );
+  }
+
+  // generate reset token and save it to session
+  let token = ''; // causes error if not assigned
+  randomBytes(48, (err, buffer) => {
+    token = buffer.toString('hex');
+  });
+
+  try {
+    // save token to session
+    // token maps to user email (token => email)
+    await redisClient.set(token, JSON.stringify(req.body.email), {
+      EX: parseInt(process.env.PIN_EXP as string)
+    });
+
+    // send mail containing the reset link
+
+    const isSent = await sendMail(
+      'khalil666chermiti@gmail.com', // change it to client's eamil
+      'reset your password !',
+      `use this link to reset your password : http://${process.env.BASE_URL}/api/v1/auth/client/reset?token=${token}`
+    );
+
+    if (isSent) {
+      return res.sendStatus(StatusCodes.OK);
+    } else {
+      new CustomError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        'orror occured, please try later'
+      );
+    }
+  } catch (error) {
+    console.log('error ', error);
+    return next(
+      new CustomError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        'error occured, please try later !'
+      )
+    );
+  }
+};
