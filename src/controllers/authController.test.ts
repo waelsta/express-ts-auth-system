@@ -1,11 +1,11 @@
 import redisClient from '../utils/redis.connect';
+import { StatusCodes } from 'http-status-codes';
+import { hashPassword } from '../utils/crypt';
 import prisma from '../utils/prisma.connect';
+import * as jwt from 'jsonwebtoken';
 import request from 'supertest';
 import app from '../app';
 import http from 'http';
-import { StatusCodes } from 'http-status-codes';
-import { ISignupFormTypes } from '../utils/validation';
-import { hashPassword } from '../utils/crypt';
 
 // *************** data samples for test **************
 
@@ -26,6 +26,11 @@ const userWithExistingPhoneNumber = {
 };
 const userWithExistingEmail = { ...userFormData, phone_number: 22222222 };
 
+const fakeJwt =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImZvbyI6ImJhciJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.5QQ3YuRVOuoNHoAQNscvjHbR9Fg5D8TpENDSqGu-Yrg';
+
+let jwtTestToken: string;
+
 // ****************************************************
 
 describe('Auth', () => {
@@ -34,6 +39,8 @@ describe('Auth', () => {
   beforeAll(async () => {
     redisClient.connect();
     prisma.$connect();
+
+    // create fake session to test user sign out
     await prisma.client.create({
       data: {
         id: 'user-1',
@@ -46,6 +53,22 @@ describe('Auth', () => {
         city: 'beja'
       }
     });
+
+    // create fake session to test for user sign out
+    const sessionKey = await redisClient.set(
+      '1111',
+      JSON.stringify({
+        id: 'user-1',
+        email: 'test1@mail.com',
+        phone_number: 11111111,
+        last_name: 'test',
+        first_name: 'test',
+        street: 'test 123',
+        city: 'beja'
+      })
+    );
+
+    jwtTestToken = jwt.sign({ sessionKey }, process.env.JWT_SECRET);
 
     server = http.createServer(app).listen(7000);
   });
@@ -154,9 +177,44 @@ describe('Auth', () => {
     });
   });
 
-  // signout success
-  it('should return signout success', () => {
-    return request(server).post('/api/v1/auth/client/signout').expect(204);
+  describe('sign out', () => {
+    // no jwt token
+    it('check for non existing jwt', async () => {
+      return request(server)
+        .post('/api/v1/auth/client/signout')
+        .expect(StatusCodes.BAD_REQUEST)
+        .then(res => {
+          expect(res.body).toMatchObject({
+            error: 'please login !'
+          });
+        });
+    });
+
+    // unvalid jwt token
+    it('should sign user out', async () => {
+      return request(server)
+        .post('/api/v1/auth/client/signout')
+        .set('Cookie', [`jwt=${fakeJwt}`])
+        .expect(StatusCodes.BAD_REQUEST)
+        .then(res => {
+          expect(res.body).toMatchObject({
+            error: 'session already expired !'
+          });
+        });
+    });
+
+    // signed out successfully
+    it('should return signed out successfully ', async () => {
+      return request(server)
+        .post('/api/v1/auth/client/signout')
+        .set('Cookie', [`jwt=${jwtTestToken}`])
+        .expect(StatusCodes.BAD_REQUEST)
+        .then(res => {
+          expect(res.body).toMatchObject({
+            data: 'signed out successfully'
+          });
+        });
+    });
   });
 
   afterAll(async () => {
