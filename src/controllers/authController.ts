@@ -1,23 +1,24 @@
+import { hashPassword, verifyPassword } from '../utils/crypt';
+import { CustomError } from '../middlewares/errorHandler';
+import { NextFunction, Request, Response } from 'express';
+import { randomUUID } from 'crypto';
+import redisClient from '../utils/redis.connect';
+import { StatusCodes } from 'http-status-codes';
+import jwt from 'jsonwebtoken';
 import {
   userSignUpSchema,
   ISignupFormTypes,
   ISigninFormTypes,
   userSignInSchema
 } from '../utils/validation';
-import { hashPassword, verifyPassword } from '../utils/crypt';
-import { CustomError } from '../middlewares/errorHandler';
-import { NextFunction, Request, Response } from 'express';
-import { randomBytes, randomUUID } from 'crypto';
-import { StatusCodes } from 'http-status-codes';
-import jwt from 'jsonwebtoken';
 import {
   saveSession,
   findClientByEmail,
   createClient,
   phoneNumberExists,
-  sendMail
+  sendMail,
+  updateClientPassword
 } from '../models/authModels';
-import redisClient from '../utils/redis.connect';
 
 const validateFormData = async (
   formValues: ISignupFormTypes | ISigninFormTypes,
@@ -42,11 +43,11 @@ const signToken = (sessionKey: string) => {
 };
 
 //handle Client signup
-export async function signup(
-  req: Request<unknown, unknown, ISignupFormTypes>,
+export const signup = async (
+  req: Request<unknown, unknown, ISignupFormTypes, unknown>,
   res: Response,
   next: NextFunction
-) {
+) => {
   // validate form data
   try {
     await validateFormData(req.body, 'signup');
@@ -125,10 +126,14 @@ export async function signup(
     .status(StatusCodes.OK)
     .cookie('jwt', token)
     .send({ data: 'signed up successfully' });
-}
+};
 
 // handle Client singin
-export async function signin(req: Request, res: Response, next: NextFunction) {
+export const signin = async (
+  req: Request<unknown, unknown, { email: string; password: string }, unknown>,
+  res: Response,
+  next: NextFunction
+) => {
   // validate form data
   try {
     await validateFormData(req.body, 'signin');
@@ -162,11 +167,11 @@ export async function signin(req: Request, res: Response, next: NextFunction) {
       new CustomError(StatusCodes.BAD_REQUEST, 'invalid credentials !')
     );
   }
-}
+};
 
 // send reset code
 export const getResetLink = async (
-  req: Request,
+  req: Request<unknown, unknown, { email: string }, unknown>,
   res: Response,
   next: NextFunction
 ) => {
@@ -192,23 +197,20 @@ export const getResetLink = async (
     );
   }
 
-  // generate reset token and save it to session
-  let token = ''; // causes error if not assigned
-  randomBytes(48, (err, buffer) => {
-    token = buffer.toString('hex');
-  });
+  // generate reset token
+  const token = randomUUID();
 
   try {
     // save token to session
     // token maps to user email (token => email)
-    await redisClient.set(token, JSON.stringify(req.body.email), {
+    await redisClient.set(token, req.body.email, {
       EX: parseInt(process.env.PIN_EXP as string)
     });
 
     // send mail containing the reset link
 
     const isSent = await sendMail(
-      'khalil666chermiti@gmail.com', // change it to client's eamil
+      'khalil666chermiti@gmail.com', // change it to client's email
       'reset your password !',
       `use this link to reset your password : http://${process.env.BASE_URL}/api/v1/auth/client/reset?token=${token}`
     );
@@ -222,11 +224,71 @@ export const getResetLink = async (
       );
     }
   } catch (error) {
-    console.log('error ', error);
     return next(
       new CustomError(
         StatusCodes.INTERNAL_SERVER_ERROR,
         'error occured, please try later !'
+      )
+    );
+  }
+};
+
+// reset password
+export const resetPassword = async (
+  req: Request<unknown, unknown, { password: string }, { token: string }>,
+  res: Response,
+  next: NextFunction
+) => {
+  // check if token exist
+  const token = req.query.token as string;
+  if (!token) {
+    return next(
+      new CustomError(StatusCodes.UNAUTHORIZED, 'action not authorized !')
+    );
+  }
+
+  // check if password exist
+  const password = req.body.password;
+  if (!password) {
+    return next(
+      new CustomError(StatusCodes.BAD_REQUEST, 'missing password field !')
+    );
+  }
+
+  // get userEmail from session
+  try {
+    const userEmail = await redisClient.get(token);
+    // session exipred
+    if (!userEmail) {
+      return next(
+        new CustomError(StatusCodes.BAD_REQUEST, 'rest link expired !')
+      );
+    }
+
+    // get user data
+    const clientData = await findClientByEmail(userEmail);
+
+    // no existing user
+    if (!clientData) {
+      return next(
+        new CustomError(StatusCodes.BAD_REQUEST, 'no user with such email !')
+      );
+    }
+
+    // update password
+    await updateClientPassword(userEmail, password);
+
+    // delete token from session
+    await redisClient.del(token as string);
+
+    return res
+      .status(StatusCodes.OK)
+      .send({ data: 'password reset successfully' });
+  } catch {
+    return next(
+      new CustomError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        'error occured please try again !'
       )
     );
   }

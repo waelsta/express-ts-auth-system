@@ -5,6 +5,7 @@ import mailer from 'nodemailer';
 
 import { randomUUID } from 'crypto';
 import { ISessionClientData } from '../utils/validation';
+import { hashPassword } from '../utils/crypt';
 
 // check for existing email
 export const findClientByEmail = async (email: string) =>
@@ -55,4 +56,11 @@ export const sendMail = async (to: string, subject: string, body: string) => {
   };
 
   return await transport.sendMail(mailOptions);
+};
+
+export const updateClientPassword = async (email: string, password: string) => {
+  return await prisma.client.update({
+    where: { email: email },
+    data: { password: hashPassword(password) }
+  });
 };

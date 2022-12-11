@@ -31,6 +31,8 @@ const fakeJwt =
 
 let jwtTestToken: string;
 
+const resetLinkToken = 'sdlkfqskfqsljflksl';
+
 // ****************************************************
 
 describe('Auth', () => {
@@ -40,7 +42,7 @@ describe('Auth', () => {
     redisClient.connect();
     prisma.$connect();
 
-    // create fake session to test user sign out
+    // create fake user to test for user login
     await prisma.client.create({
       data: {
         id: 'user-1',
@@ -53,6 +55,9 @@ describe('Auth', () => {
         city: 'beja'
       }
     });
+
+    // create session to test user password reset link
+    await redisClient.set(resetLinkToken, 'test1@mail.com');
 
     // create fake session to test for user sign out
     const sessionKey = await redisClient.set(
@@ -249,6 +254,41 @@ describe('Auth', () => {
     }, 20000);
   });
 
+  describe('reset password', () => {
+    it('should return missing reset token', async () => {
+      return request(server)
+        .get('/api/v1/auth/client/reset')
+        .expect(StatusCodes.UNAUTHORIZED)
+        .then(res => {
+          expect(res.body).toMatchObject({
+            error: 'action not authorized !'
+          });
+        });
+    });
+
+    it('should return missing password', async () => {
+      return request(server)
+        .get('/api/v1/auth/client/reset?token=jfsldjfkskldfjlsdk')
+        .expect(StatusCodes.BAD_REQUEST)
+        .then(res => {
+          expect(res.body).toMatchObject({
+            error: 'missing password field !'
+          });
+        });
+    });
+
+    it('should return OK', async () => {
+      return request(server)
+        .get(`/api/v1/auth/client/reset?token=${resetLinkToken}`)
+        .send({ password: 'someNewPassword123' })
+        .expect(StatusCodes.OK)
+        .then(res => {
+          expect(res.body).toMatchObject({
+            data: 'password reset successfully'
+          });
+        });
+    });
+  });
   afterAll(async () => {
     await prisma.client.deleteMany({ where: { email: 'test1@mail.com' } });
     await prisma.client.deleteMany({ where: { email: 'test2@mail.com' } });
