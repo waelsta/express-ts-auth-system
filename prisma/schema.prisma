@@ -25,15 +25,16 @@ model Client {
 }
 
 model Employee {
-  id             Int      @id @default(autoincrement())
+  id             String   @id
   createdAt      DateTime @default(now())
   first_name     String
   last_name      String
-  cv_url         String
+  // cv_url         String
   profession     String
-  phone_number   String   @unique
+  phone_number   Int      @unique
   email          String   @unique
   password       String
   still_employed Boolean
-  coordinates    String?
+  lat            Float?
+  long           Float?
 }

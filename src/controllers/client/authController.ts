@@ -1,33 +1,30 @@
-import { hashPassword, verifyPassword } from '../utils/crypt';
-import { CustomError } from '../middlewares/errorHandler';
+import { clientSignInSchema, clientSignUpSchema } from '../../utils/validation';
+import { ISigninFormTypes, ISignupFormTypes } from '../../types/client';
+import { hashPassword, verifyPassword } from '../../utils/crypt';
+import { CustomError } from '../../middlewares/errorHandler';
 import { NextFunction, Request, Response } from 'express';
-import { randomUUID } from 'crypto';
-import redisClient from '../utils/redis.connect';
+import redisClient from '../../utils/redis.connect';
+import { sendMail } from '../../models/mailModel';
 import { StatusCodes } from 'http-status-codes';
+import { randomUUID } from 'crypto';
 import jwt from 'jsonwebtoken';
+
 import {
-  userSignUpSchema,
-  ISignupFormTypes,
-  ISigninFormTypes,
-  userSignInSchema
-} from '../utils/validation';
-import {
-  saveSession,
-  findClientByEmail,
   createClient,
+  findClientByEmail,
   phoneNumberExists,
-  sendMail,
+  saveSession,
   updateClientPassword
-} from '../models/authModels';
+} from '../../models/client/authModels';
 
 const validateFormData = async (
   formValues: ISignupFormTypes | ISigninFormTypes,
   type: 'signin' | 'signup'
 ) => {
   if (type === 'signup') {
-    return await userSignUpSchema.validate(formValues);
+    return await clientSignUpSchema.validate(formValues);
   } else if (type === 'signin') {
-    return await userSignInSchema.validate(formValues);
+    return await clientSignInSchema.validate(formValues);
   } else {
     return;
   }
@@ -43,7 +40,7 @@ const signToken = (sessionKey: string) => {
 };
 
 //handle Client signup
-export const signup = async (
+const signup = async (
   req: Request<unknown, unknown, ISignupFormTypes, unknown>,
   res: Response,
   next: NextFunction
@@ -129,7 +126,7 @@ export const signup = async (
 };
 
 // handle Client singin
-export const signin = async (
+const signin = async (
   req: Request<unknown, unknown, { email: string; password: string }, unknown>,
   res: Response,
   next: NextFunction
@@ -170,7 +167,7 @@ export const signin = async (
 };
 
 // send reset code
-export const getResetLink = async (
+const getResetLink = async (
   req: Request<unknown, unknown, { email: string }, unknown>,
   res: Response,
   next: NextFunction
@@ -234,7 +231,7 @@ export const getResetLink = async (
 };
 
 // reset password
-export const resetPassword = async (
+const resetPassword = async (
   req: Request<unknown, unknown, { password: string }, { token: string }>,
   res: Response,
   next: NextFunction
@@ -292,4 +289,11 @@ export const resetPassword = async (
       )
     );
   }
+};
+
+export const clientAuth = {
+  signup,
+  signin,
+  getResetLink,
+  resetPassword
 };

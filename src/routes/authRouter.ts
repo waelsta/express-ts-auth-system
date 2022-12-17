@@ -1,16 +1,20 @@
+import { clientAuth } from '../controllers/client/authController';
 import express from 'express';
-import {
-  signup,
-  signin,
-  getResetLink,
-  resetPassword
-} from '../controllers/authController';
+import { employeeAuth } from '../controllers/employee/authController';
 import { signout } from '../controllers/signoutController';
+
 const authRouter = express.Router();
 
-authRouter.route('/client/signup').post(signup);
-authRouter.route('/client/signin').post(signin);
+authRouter.route('/client/signup').post(clientAuth.signup);
+authRouter.route('/client/signin').post(clientAuth.signin);
+authRouter.route('/client/link').post(clientAuth.getResetLink);
+authRouter.route('/client/reset').get(clientAuth.resetPassword);
 authRouter.route('/client/signout').post(signout);
-authRouter.route('/client/link').post(getResetLink); // get reset link
-authRouter.route('/client/reset').get(resetPassword); // reset password
+
+authRouter.route('/employee/signup').post(employeeAuth.signup);
+authRouter.route('/employee/signin').post(employeeAuth.signin);
+authRouter.route('/employee/link').post(employeeAuth.getResetLink);
+authRouter.route('/employee/reset').get(employeeAuth.resetPassword);
+authRouter.route('/employee/signout').post(signout);
+
 export default authRouter;

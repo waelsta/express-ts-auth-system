@@ -1,15 +1,16 @@
-import { Request, Response, NextFunction } from 'express';
-import { StatusCodes } from 'http-status-codes';
-import redisClient from '../utils/redis.connect';
-import jwt from 'jsonwebtoken';
-import { CustomError } from '../middlewares/errorHandler';
 import { RedisCommandArgument } from '@redis/client/dist/lib/commands';
+import { CustomError } from '../middlewares/errorHandler';
+import { NextFunction, Request, Response } from 'express';
+import redisClient from '../utils/redis.connect';
+import { StatusCodes } from 'http-status-codes';
+import { IjwtPayload } from '../types/types';
+import jwt from 'jsonwebtoken';
 
-interface IjwtPayload {
-  sessionKey: string;
-}
-
-export async function signout(req: Request, res: Response, next: NextFunction) {
+export const signout = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const token = req.cookies.jwt;
 
   // no token
@@ -46,4 +47,4 @@ export async function signout(req: Request, res: Response, next: NextFunction) {
       )
     );
   }
-}
+};

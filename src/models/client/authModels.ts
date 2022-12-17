@@ -1,11 +1,10 @@
-import redisClient from '../utils/redis.connect';
-import prisma from '../utils/prisma.connect';
+import { ISessionClientData } from '../../types/client';
+import redisClient from '../../utils/redis.connect';
 import { Client, Employee } from '@prisma/client';
-import mailer from 'nodemailer';
-
+import { hashPassword } from '../../utils/crypt';
+import prisma from '../../utils/prisma.connect';
 import { randomUUID } from 'crypto';
-import { ISessionClientData } from '../utils/validation';
-import { hashPassword } from '../utils/crypt';
+import mailer from 'nodemailer';
 
 // check for existing email
 export const findClientByEmail = async (email: string) =>
@@ -19,15 +18,12 @@ export const findEmployeeByEmail = async (email: string) =>
   });
 
 // check for existing phone number
-export const phoneNumberExists = async (phone: number) => {
-  return prisma.client.findUnique({ where: { phone_number: phone } });
-};
+export const phoneNumberExists = async (phone: number) =>
+  prisma.client.findUnique({ where: { phone_number: phone } });
 
 // insert user into database ;
-export const createClient = async (client: Client) => {
-  const clientData = await prisma.client.create({ data: client });
-  return clientData;
-};
+export const createClient = async (client: Client) =>
+  await prisma.client.create({ data: client });
 
 export const saveSession = async (
   user: ISessionClientData | Employee | Client
