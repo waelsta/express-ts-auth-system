@@ -10,8 +10,8 @@ const app = express();
 // middlewares
 app.use(helmet());
 app.use(cookieParser());
-app.use(cors(corsOptions));
 app.use(credentials);
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // routes

@@ -133,6 +133,7 @@ const signin = async (
 ) => {
   // validate form data
   try {
+    console.log(req.body)
     await validateFormData(req.body, 'signin');
   } catch (error) {
     return next(
