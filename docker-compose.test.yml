@@ -10,6 +10,7 @@ services:
       target: dev-bind
     environment:
       - ENV=DEVELOPMENT
+      - TEST=TRUE
       - PORT=5000
       - DATABASE_URL=postgresql://admin:123@psql-test-db:5432/service
       - REDIS_URL=redis://redis-test

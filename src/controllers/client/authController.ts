@@ -133,7 +133,6 @@ const signin = async (
 ) => {
   // validate form data
   try {
-    console.log(req.body);
     await validateFormData(req.body, 'signin');
   } catch (error) {
     return next(
@@ -201,7 +200,7 @@ const getResetLink = async (
   try {
     // save token to session
     // token maps to user email (token => email)
-    await redisClient.set(token, req.body.email, {
+    await redisClient.set(token, JSON.stringify(req.body), {
       EX: parseInt(process.env.PIN_EXP as string)
     });
 
