@@ -9,7 +9,7 @@ export const allowedOrigins = [
   `http://localhost:7000`,
   `localhost:7000`,
   'http://127.0.0.1:3000/*',
-  'http://localhost:3000',
+  'http://localhost:3000'
 ];
 
 // Allow Credentials for allowed origins
