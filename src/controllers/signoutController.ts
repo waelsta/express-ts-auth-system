@@ -12,7 +12,7 @@ export const signout = async (
   next: NextFunction
 ) => {
   const token = req.cookies.jwt;
-
+  console.log("cookies : " , req.cookies);
   // no token
   if (!token) {
     return next(new CustomError(StatusCodes.BAD_REQUEST, 'please login !'));
@@ -37,7 +37,7 @@ export const signout = async (
     await redisClient.del(sessionKey as RedisCommandArgument);
     res.clearCookie('jwt', { httpOnly: true });
     return res
-      .status(StatusCodes.BAD_REQUEST)
+      .status(StatusCodes.OK)
       .send({ data: 'signed out successfully' });
   } catch {
     return next(
