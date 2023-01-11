@@ -36,9 +36,7 @@ export const signout = async (
   try {
     await redisClient.del(sessionKey as RedisCommandArgument);
     res.clearCookie('jwt', { httpOnly: true });
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .send({ data: 'signed out successfully' });
+    return res.status(StatusCodes.OK).send({ data: 'signed out successfully' });
   } catch {
     return next(
       new CustomError(

@@ -31,7 +31,7 @@ app.use('/api/v1/employee', employeeRouter);
 
 app.use(
   (err: ErrorHandler, req: Request, res: Response, next: NextFunction) => {
-    return res.status(err.statusCode).send({ error: err.message });
+    return res.status(err.statusCode || 500).send({ error: err.message });
   }
 );
 
