@@ -10,6 +10,12 @@ declare global {
       MAIL_USER: string;
       MAIL_PASSWORD: string;
       BASE_URL: string;
+      PROFILE_PICTURES_FOLDER: string;
+    }
+  }
+  namespace Express {
+    interface Request {
+      userId: string;
     }
   }
 }

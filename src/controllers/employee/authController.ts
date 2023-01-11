@@ -26,6 +26,7 @@ import {
   createEmployee
 } from '../../models/employee/authModel';
 import { cities } from '../../utils/citiesCoordinates';
+import { Employee } from '@prisma/client';
 
 const validateSignInData = async (employeeFormData: IEmployeeSigninTypes) =>
   await employeeSignInSchema.validate(employeeFormData);
@@ -88,17 +89,17 @@ const signup = async (
     still_employed: false
   };
 
-  const employeeData = {
+  const employeeData: Employee = {
     ...sessionData,
+    profile_picture_url: null,
     password: hashPassword(req.body.password),
-    phone_number: req.body.phone_number
+    phone_number: parseInt(req.body.phone_number)
   };
 
   // saving user data
   try {
     await createEmployee({
-      ...employeeData,
-      phone_number: parseInt(employeeData.phone_number)
+      ...employeeData
     });
   } catch (error) {
     return next(

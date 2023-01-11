@@ -16,6 +16,7 @@ import {
   saveSession,
   updateClientPassword
 } from '../../models/client/authModels';
+import { Client } from '@prisma/client';
 
 const validateFormData = async (
   formValues: ISignupFormTypes | ISigninFormTypes,
@@ -84,8 +85,9 @@ const signup = async (
     is_client: false
   };
 
-  const clientData = {
+  const clientData: Client = {
     ...sessionData,
+    profile_picture_url: null,
     password: hashPassword(req.body.password),
     phone_number: parseInt(req.body.phone_number)
   };
@@ -150,7 +152,17 @@ const signin = async (
   // verify password
   if (verifyPassword(req.body.password, emailExist.password)) {
     //get full user data and save to redis session
-    const sessionKey = await saveSession(emailExist);
+    const sessionKey = await saveSession({
+      first_name: emailExist.first_name,
+      last_name: emailExist.last_name,
+      createdAt: emailExist.createdAt,
+      is_client: emailExist.is_client,
+      phone_number: emailExist.phone_number.toString(),
+      email: emailExist.email,
+      street: emailExist.street,
+      city: emailExist.city,
+      id: emailExist.id
+    });
 
     //sign and send jwt
     const token = signToken(sessionKey);
