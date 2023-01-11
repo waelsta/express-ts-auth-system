@@ -1,6 +1,6 @@
 import { ISessionClientData } from '../../types/client';
 import redisClient from '../../utils/redis.connect';
-import { Client, Employee } from '@prisma/client';
+import { Client } from '@prisma/client';
 import { hashPassword } from '../../utils/crypt';
 import prisma from '../../utils/prisma.connect';
 import { randomUUID } from 'crypto';

@@ -1,3 +1,4 @@
+import { Client, Employee } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { IjwtPayload } from '../types/types';
@@ -5,7 +6,8 @@ import { verifyJwtToken } from '../utils/crypt';
 import redisClient from '../utils/redis.connect';
 import { CustomError } from './errorHandler';
 
-export const getClientData = async (
+// middleware to check if user is authenticated
+export const checkAuth = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -38,6 +40,6 @@ export const getClientData = async (
   }
 
   // saving userId to request object to be accessable on next req handler
-  req.userId = (JSON.parse(client) as { id: string }).id;
+  res.locals.userId = (JSON.parse(client) as Client & Employee).id;
   next();
 };

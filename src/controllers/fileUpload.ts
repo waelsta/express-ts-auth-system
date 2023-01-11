@@ -1,8 +1,8 @@
+import { uploadImageMapper, users } from '../utils/Mapper';
 import { NextFunction, Request, Response } from 'express';
 import { CustomError } from '../middlewares/errorHandler';
 import { StatusCodes } from 'http-status-codes';
 import { upload } from '../utils/multerConfig';
-import { uploadImageMapper } from '../utils/Mapper';
 
 const uploadPicture = upload.single('profile');
 
@@ -12,8 +12,21 @@ export const uploadProfilePic = async (
   next: NextFunction
 ) => {
   uploadPicture(req, res, err => {
+    // get user type , user id and image name
+    const userId = res.locals.userId;
+    const userRole: string = req.query.user as string;
+    const pictureFileName = req.file?.filename as string;
+
+    // handle file upload errors
     if (err) {
       return next(new CustomError(StatusCodes.BAD_REQUEST, err.message));
+    }
+
+    // user type is not specified
+    if (!userRole || !users.includes(userRole)) {
+      return next(
+        new CustomError(StatusCodes.BAD_REQUEST, 'missing or wrong user type')
+      );
     }
 
     // file exists
@@ -42,7 +55,14 @@ export const uploadProfilePic = async (
       );
     }
     // save picture name to database
-    uploadImageMapper.get(req.params.user)!('jfkdjf', 'jfkdf ');
+    try {
+      uploadImageMapper.get(userRole)!(userId, pictureFileName);
+    } catch {
+      new CustomError(
+        StatusCodes.BAD_REQUEST,
+        'error while uploading your image , try again'
+      );
+    }
     return res
       .status(StatusCodes.CREATED)
       .json({ message: 'file uploaded successfully' });

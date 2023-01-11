@@ -12,6 +12,7 @@ services:
       - .env
     volumes:
       - .:/app
+      - /home/khalil/pictures:/home/pictures
     ports:
       - 5000:5000
     networks:
