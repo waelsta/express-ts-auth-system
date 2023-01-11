@@ -25,9 +25,7 @@ export const phoneNumberExists = async (phone: number) =>
 export const createClient = async (client: Client) =>
   await prisma.client.create({ data: client });
 
-export const saveSession = async (
-  user: ISessionClientData | Employee | Client
-) => {
+export const saveSession = async (user: ISessionClientData) => {
   const sessionKey = randomUUID();
   await redisClient.set(sessionKey, JSON.stringify(user), {
     EX: parseInt(process.env.SESSION_EXP as string)

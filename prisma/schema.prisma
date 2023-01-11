@@ -12,29 +12,31 @@ datasource db {
 }
 
 model Client {
-  id           String   @id
-  createdAt    DateTime @default(now())
-  email        String   @unique
-  first_name   String
-  last_name    String
-  city         String
-  street       String
-  phone_number Int      @unique
-  is_client    Boolean  @default(false)
-  password     String
+  id                  String   @id
+  createdAt           DateTime @default(now())
+  email               String   @unique
+  first_name          String
+  last_name           String
+  city                String
+  street              String
+  phone_number        Int      @unique
+  is_client           Boolean  @default(false)
+  password            String
+  profile_picture_url String?
 }
 
 model Employee {
-  id             String   @id
-  createdAt      DateTime @default(now())
-  first_name     String
-  last_name      String
+  id                  String   @id
+  createdAt           DateTime @default(now())
+  first_name          String
+  last_name           String
   // cv_url         String
-  profession     String
-  phone_number   Int      @unique
-  email          String   @unique
-  password       String
-  still_employed Boolean
-  lat            Float?
-  long           Float?
+  profession          String
+  phone_number        Int      @unique
+  email               String   @unique
+  password            String
+  still_employed      Boolean
+  lat                 Float?
+  long                Float?
+  profile_picture_url String?
 }
