@@ -12,4 +12,9 @@ declare global {
       BASE_URL: string;
     }
   }
+  namespace Express {
+    interface Request {
+      userId: string;
+    }
+  }
 }
