@@ -6,6 +6,10 @@ EXPOSE 5000
 
 # rely on host node_modules
 FROM base AS dev-bind
+RUN mkdir /home/pictures 
+RUN chmod 777 /home/pictures
+RUN chown node:node /home/pictures
+
 ENV NODE_ENV=development
 
 # create development container
