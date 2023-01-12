@@ -3,7 +3,7 @@ interface IEmployee {
   first_name: string;
   last_name: string;
   email: string;
-  profession: string;
+  profession: string | null;
 }
 
 export interface ISessionEmployeeData extends IEmployee {

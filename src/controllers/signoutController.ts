@@ -12,7 +12,10 @@ export const signout = async (
   next: NextFunction
 ) => {
   const token = req.cookies.jwt;
+<<<<<<< HEAD
   console.log("cookies : " , req.cookies);
+=======
+>>>>>>> 38fc449 (feat(sevices): add services modal in prisma)
   // no token
   if (!token) {
     return next(new CustomError(StatusCodes.BAD_REQUEST, 'please login !'));
