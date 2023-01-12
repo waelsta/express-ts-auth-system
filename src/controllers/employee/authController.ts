@@ -23,7 +23,8 @@ import {
   saveEmployeeSession,
   findEmployeeByEmail,
   phoneNumberExists,
-  createEmployee
+  createEmployee,
+  findServiceByName
 } from '../../models/employee/authModel';
 import { cities } from '../../utils/citiesCoordinates';
 import { Employee } from '@prisma/client';
@@ -78,7 +79,7 @@ const signup = async (
   const sessionData = {
     phone_number: req.body.phone_number,
     first_name: req.body.first_name,
-    profession: req.body.profession,
+    profession: (await findServiceByName(req.body.profession!))?.id || null,
     last_name: req.body.last_name,
     email: req.body.email,
     lat: cities[req.body.city as keyof typeof cities].lat,

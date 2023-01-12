@@ -31,7 +31,8 @@ model Employee {
   first_name          String
   last_name           String
   // cv_url         String
-  profession          String
+  profession          String?
+  service             Service? @relation(fields: [profession], references: [id])
   phone_number        Int      @unique
   email               String   @unique
   password            String
@@ -39,4 +40,11 @@ model Employee {
   lat                 Float?
   long                Float?
   profile_picture_url String?
+}
+
+model Service {
+  id          String     @id
+  label       String     @unique
+  description String?
+  Employee    Employee[]
 }

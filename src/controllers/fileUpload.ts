@@ -3,17 +3,18 @@ import { NextFunction, Request, Response } from 'express';
 import { CustomError } from '../middlewares/errorHandler';
 import { StatusCodes } from 'http-status-codes';
 import { upload } from '../utils/multerConfig';
+import { Client, Employee } from '@prisma/client';
 
 const uploadPicture = upload.single('profile');
 
 export const uploadProfilePic = async (
   req: Request,
-  res: Response<any, { userId: string }>,
+  res: Response<any, { userData: Client | Employee }>,
   next: NextFunction
 ) => {
   uploadPicture(req, res, err => {
     // get user type , user id and image name
-    const userId = res.locals.userId;
+    const userId = res.locals.userData.id;
     const userRole: string = req.query.user as string;
     const pictureFileName = req.file?.filename as string;
 

@@ -230,7 +230,7 @@ describe('Client Auth', () => {
       return request(server)
         .post('/api/v1/auth/client/signout')
         .set('Cookie', [`jwt=${clientTestData.jwtTestToken}`])
-        .expect(StatusCodes.BAD_REQUEST)
+        .expect(StatusCodes.OK)
         .then(res => {
           expect(res.body).toMatchObject({
             data: 'signed out successfully'

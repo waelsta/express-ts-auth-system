@@ -12,7 +12,6 @@ export const signout = async (
   next: NextFunction
 ) => {
   const token = req.cookies.jwt;
-  console.log('cookies : ', req.cookies);
   // no token
   if (!token) {
     return next(new CustomError(StatusCodes.BAD_REQUEST, 'please login !'));

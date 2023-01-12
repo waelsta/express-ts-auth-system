@@ -61,7 +61,6 @@ describe('Employee Auth', () => {
       data: {
         password: hashPassword('Test12345'),
         email: 'test1@mail.com',
-        profession: 'Engineer',
         phone_number: 11111111,
         still_employed: true,
         first_name: 'test',

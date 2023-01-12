@@ -40,6 +40,6 @@ export const checkAuth = async (
   }
 
   // saving userId to request object to be accessable on next req handler
-  res.locals.userId = (JSON.parse(client) as Client & Employee).id;
+  res.locals.user = JSON.parse(client) as Client | Employee;
   next();
 };
