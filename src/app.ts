@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import { corsOptions, credentials } from './utils/corsConfig';
 import { ErrorHandler } from './middlewares/errorHandler';
 import employeeRouter from './routes/employeeRouter';
+import uploadsRouter from './routes/uploadsRouter';
 import clientRouter from './routes/clientRouter';
 import authRouter from './routes/authRouter';
 import cookieParser from 'cookie-parser';
@@ -27,11 +28,12 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/client', clientRouter);
+app.use('/api/v1/uploads/', uploadsRouter);
 app.use('/api/v1/employee', employeeRouter);
 
 app.use(
   (err: ErrorHandler, req: Request, res: Response, next: NextFunction) => {
-    return res.status(err.statusCode).send({ error: err.message });
+    return res.status(err.statusCode || 500).send({ error: err.message });
   }
 );
 
