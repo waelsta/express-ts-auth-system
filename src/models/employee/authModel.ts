@@ -2,7 +2,7 @@ import { ISessionEmployeeData } from '../../types/employee';
 import redisClient from '../../utils/redis.connect';
 import { hashPassword } from '../../utils/crypt';
 import prisma from '../../utils/prisma.connect';
-import { Employee, Service } from '@prisma/client';
+import { Employee} from '@prisma/client';
 import { randomUUID } from 'crypto';
 
 // check for existing email
@@ -36,8 +36,4 @@ export const updateEmployeePassword = async (
     where: { email: email },
     data: { password: hashPassword(password) }
   });
-};
-
-export const findServiceByName = async (name: string) => {
-  return await prisma.service.findFirst({ where: { label: name } });
 };
