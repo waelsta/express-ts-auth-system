@@ -1,6 +1,6 @@
-import { ISessionClientData } from '../../types/client';
+import { ClientSession } from '../../types/client';
 import redisClient from '../../utils/redis.connect';
-import { Client } from '@prisma/client';
+import { Client, Employee } from '@prisma/client';
 import { hashPassword } from '../../utils/crypt';
 import prisma from '../../utils/prisma.connect';
 import { randomUUID } from 'crypto';
@@ -25,7 +25,7 @@ export const phoneNumberExists = async (phone: number) =>
 export const createClient = async (client: Client) =>
   await prisma.client.create({ data: client });
 
-export const saveSession = async (user: ISessionClientData) => {
+export const saveClientSession = async (user: ClientSession) => {
   const sessionKey = randomUUID();
   await redisClient.set(sessionKey, JSON.stringify(user), {
     EX: parseInt(process.env.SESSION_EXP as string)
@@ -52,7 +52,15 @@ export const sendMail = async (to: string, subject: string, body: string) => {
   return await transport.sendMail(mailOptions);
 };
 
-export const updateClientPassword = async (email: string, password: string) => {
+type updateUserPassword = (
+  email: string,
+  pwd: string
+) => Promise<Client | Employee>;
+
+export const updateClientPassword: updateUserPassword = async (
+  email: string,
+  password: string
+): Promise<Client> => {
   return await prisma.client.update({
     where: { email: email },
     data: { password: hashPassword(password) }

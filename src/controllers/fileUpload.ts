@@ -1,4 +1,4 @@
-import { uploadImageMapper, users } from '../utils/Mapper';
+import { userMapper, users, UserTypes } from '../utils/userMappr';
 import { NextFunction, Request, Response } from 'express';
 import { CustomError } from '../middlewares/errorHandler';
 import { StatusCodes } from 'http-status-codes';
@@ -15,7 +15,7 @@ export const uploadProfilePic = async (
   uploadPicture(req, res, err => {
     // get user type , user id and image name
     const userId = res.locals.userData.id;
-    const userRole: string = req.query.user as string;
+    const userRole = req.query.user as UserTypes;
     const pictureFileName = req.file?.filename as string;
 
     // handle file upload errors
@@ -57,7 +57,7 @@ export const uploadProfilePic = async (
     }
     // save picture name to database
     try {
-      uploadImageMapper.get(userRole)!(userId, pictureFileName);
+      userMapper.get(userRole)!.uploadUserPicture(userId, pictureFileName);
     } catch {
       new CustomError(
         StatusCodes.BAD_REQUEST,

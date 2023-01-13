@@ -23,3 +23,7 @@ export const createService = async (service: Service) => {
     data: { ...service }
   });
 };
+
+export const deleteService = async (serviceId: string) => {
+  return await prisma.service.delete({ where: { id: serviceId } });
+};

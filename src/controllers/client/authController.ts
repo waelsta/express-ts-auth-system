@@ -1,5 +1,3 @@
-import { clientSignInSchema, clientSignUpSchema } from '../../utils/validation';
-import { ISigninFormTypes, ISignupFormTypes } from '../../types/client';
 import { hashPassword, verifyPassword } from '../../utils/crypt';
 import { CustomError } from '../../middlewares/errorHandler';
 import { NextFunction, Request, Response } from 'express';
@@ -13,23 +11,15 @@ import {
   createClient,
   findClientByEmail,
   phoneNumberExists,
-  saveSession,
+  saveClientSession,
   updateClientPassword
 } from '../../models/client/authModels';
 import { Client } from '@prisma/client';
-
-const validateFormData = async (
-  formValues: ISignupFormTypes | ISigninFormTypes,
-  type: 'signin' | 'signup'
-) => {
-  if (type === 'signup') {
-    return await clientSignUpSchema.validate(formValues);
-  } else if (type === 'signin') {
-    return await clientSignInSchema.validate(formValues);
-  } else {
-    return;
-  }
-};
+import {
+  ClientFormTypes,
+  validateClientData,
+  ValidateSignInData
+} from '../../utils/validation';
 
 const signToken = (sessionKey: string) => {
   const { JWT_SECRET, SESSION_EXP } = process.env;
@@ -42,13 +32,13 @@ const signToken = (sessionKey: string) => {
 
 //handle Client signup
 const signup = async (
-  req: Request<unknown, unknown, ISignupFormTypes, unknown>,
+  req: Request<unknown, unknown, ClientFormTypes, unknown>,
   res: Response,
   next: NextFunction
 ) => {
   // validate form data
   try {
-    await validateFormData(req.body, 'signup');
+    await validateClientData(req.body);
   } catch {
     return next(
       new CustomError(StatusCodes.BAD_REQUEST, 'missing or invalid form data !')
@@ -107,7 +97,7 @@ const signup = async (
   // save client session data to redis
   let sessionKey;
   try {
-    sessionKey = await saveSession(sessionData);
+    sessionKey = await saveClientSession(sessionData);
   } catch (error) {
     return next(
       new CustomError(
@@ -135,7 +125,7 @@ const signin = async (
 ) => {
   // validate form data
   try {
-    await validateFormData(req.body, 'signin');
+    await ValidateSignInData(req.body);
   } catch (error) {
     return next(
       new CustomError(StatusCodes.BAD_REQUEST, 'invalid or missing data !')
@@ -152,7 +142,7 @@ const signin = async (
   // verify password
   if (verifyPassword(req.body.password, emailExist.password)) {
     //get full user data and save to redis session
-    const sessionKey = await saveSession({
+    const sessionKey = await saveClientSession({
       first_name: emailExist.first_name,
       last_name: emailExist.last_name,
       createdAt: emailExist.createdAt,
