@@ -1,8 +1,8 @@
-import { ISessionEmployeeData } from '../../types/employee';
+import { EmployeeSession } from '../../types/employee';
 import redisClient from '../../utils/redis.connect';
 import { hashPassword } from '../../utils/crypt';
 import prisma from '../../utils/prisma.connect';
-import { Employee} from '@prisma/client';
+import { Employee } from '@prisma/client';
 import { randomUUID } from 'crypto';
 
 // check for existing email
@@ -20,7 +20,7 @@ export const phoneNumberExists = async (phone: number) =>
 export const createEmployee = async (employee: Employee) =>
   await prisma.employee.create({ data: employee });
 
-export const saveEmployeeSession = async (user: ISessionEmployeeData) => {
+export const saveEmployeeSession = async (user: EmployeeSession) => {
   const sessionKey = randomUUID();
   await redisClient.set(sessionKey, JSON.stringify(user), {
     EX: parseInt(process.env.SESSION_EXP as string)

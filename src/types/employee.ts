@@ -1,4 +1,4 @@
-interface IEmployee {
+export interface IEmployee {
   phone_number: string;
   first_name: string;
   last_name: string;
@@ -6,19 +6,8 @@ interface IEmployee {
   profession: string | null;
 }
 
-export interface ISessionEmployeeData extends IEmployee {
+export interface EmployeeSession extends IEmployee {
   still_employed: boolean;
   createdAt: Date;
   id: string;
-}
-
-export interface IEmployeeSignupTypes extends IEmployee {
-  password_match: string;
-  password: string;
-  city: string;
-}
-
-export interface IEmployeeSigninTypes {
-  email: string;
-  password: string;
 }

@@ -8,15 +8,10 @@ import { randomUUID } from 'crypto';
 import jwt from 'jsonwebtoken';
 
 import {
-  employeeSignInSchema,
-  EmployeeSignUpSchema
+  EmployeeFormTypes,
+  validateEmployeeData,
+  ValidateSignInData
 } from '../../utils/validation';
-
-// new imports
-import {
-  IEmployeeSignupTypes,
-  IEmployeeSigninTypes
-} from '../../types/employee';
 
 import {
   updateEmployeePassword,
@@ -29,12 +24,6 @@ import { findServiceByName } from '../../models/serviceModal';
 import { cities } from '../../utils/citiesCoordinates';
 import { Employee } from '@prisma/client';
 
-const validateSignInData = async (employeeFormData: IEmployeeSigninTypes) =>
-  await employeeSignInSchema.validate(employeeFormData);
-
-const validateSignUpData = async (employeeFormData: IEmployeeSignupTypes) =>
-  await EmployeeSignUpSchema.validate(employeeFormData);
-
 const signToken = (sessionKey: string) => {
   const { JWT_SECRET, SESSION_EXP } = process.env;
   const token = jwt.sign({ sessionKey }, JWT_SECRET as string, {
@@ -46,13 +35,13 @@ const signToken = (sessionKey: string) => {
 
 // handle Client signup
 const signup = async (
-  req: Request<unknown, unknown, IEmployeeSignupTypes, unknown>,
+  req: Request<unknown, unknown, EmployeeFormTypes, unknown>,
   res: Response,
   next: NextFunction
 ) => {
   // validate form data
   try {
-    await validateSignUpData(req.body);
+    await validateEmployeeData(req.body);
   } catch {
     return next(
       new CustomError(StatusCodes.BAD_REQUEST, 'missing or invalid form data !')
@@ -144,7 +133,7 @@ const signin = async (
 ) => {
   // validate form data
   try {
-    await validateSignInData(req.body);
+    await ValidateSignInData(req.body);
   } catch (error) {
     return next(
       new CustomError(StatusCodes.BAD_REQUEST, 'invalid or missing data !')

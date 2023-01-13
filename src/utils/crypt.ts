@@ -1,7 +1,6 @@
 // hash
 import { randomBytes, scryptSync, timingSafeEqual } from 'crypto';
 import jwt from 'jsonwebtoken';
-import { IjwtPayload } from '../types/types';
 
 // hashing password adding salt
 export const hashPassword = (password: string) => {
