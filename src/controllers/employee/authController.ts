@@ -23,9 +23,9 @@ import {
   saveEmployeeSession,
   findEmployeeByEmail,
   phoneNumberExists,
-  createEmployee,
-  findServiceByName
+  createEmployee
 } from '../../models/employee/authModel';
+import { findServiceByName } from '../../models/serviceModal';
 import { cities } from '../../utils/citiesCoordinates';
 import { Employee } from '@prisma/client';
 

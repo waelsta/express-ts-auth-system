@@ -9,6 +9,7 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import cors from 'cors';
+import serviceRouter from './routes/serviceRouter';
 
 const app = express();
 // middlewares
@@ -30,6 +31,7 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/client', clientRouter);
 app.use('/api/v1/uploads/', uploadsRouter);
 app.use('/api/v1/employee', employeeRouter);
+app.use('/api/v1/service', serviceRouter);
 
 app.use(
   (err: ErrorHandler, req: Request, res: Response, next: NextFunction) => {
