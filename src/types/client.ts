@@ -1,4 +1,4 @@
-interface IUser {
+export interface IUser {
   phone_number: string;
   first_name: string;
   last_name: string;
@@ -7,18 +7,8 @@ interface IUser {
   city: string;
 }
 
-export interface ISessionClientData extends IUser {
+export interface ClientSession extends IUser {
   is_client: boolean;
   createdAt: Date;
   id: string;
-}
-
-export interface ISignupFormTypes extends IUser {
-  password_match: string;
-  password: string;
-}
-
-export interface ISigninFormTypes {
-  email: string;
-  password: string;
 }

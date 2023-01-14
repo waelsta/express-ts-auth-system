@@ -1,8 +1,8 @@
-import { getEmployeeData } from '../controllers/employee/employeeController';
-import express from 'express';
+// import { getEmployeeData } from '../controllers/employee/employeeController';
+// import express from 'express';
 
-const employeeRouter = express.Router();
+// const employeeRouter = express.Router();
 
-employeeRouter.get('/', getEmployeeData);
+// employeeRouter.get('/', getEmployeeData);
 
-export default employeeRouter;
+// export default employeeRouter;

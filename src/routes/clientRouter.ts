@@ -1,4 +1,4 @@
-import { getClientData } from '../controllers/client/clientController';
+import { getClientData } from '../controllers/clientController';
 import { uploadProfilePic } from '../controllers/fileUpload';
 import { checkAuth } from '../middlewares/authHandler';
 import express from 'express';

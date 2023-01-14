@@ -1,47 +1,47 @@
-import redisClient from '../../utils/redis.connect';
-import { hashPassword } from '../../utils/crypt';
+import redisClient from '../src/services/redis.connect';
+import { hashPassword } from '../src/utils/crypt';
 import { StatusCodes } from 'http-status-codes';
-import prisma from '../../utils/prisma.connect';
+import prisma from '../src/services/prisma.connect';
 import * as jwt from 'jsonwebtoken';
 import request from 'supertest';
-import app from '../../app';
+import app from '../src/app';
 import http from 'http';
 
 // *************** data samples for test **************
 
-const employeeTestData = {
-  formData: {
-    password_match: 'Test12345',
+const clientTestData = {
+  clientFormData: {
     email: 'test1@mail.com',
-    profession: 'Engineer',
-    phone_number: 11111111,
     password: 'Test12345',
-    first_name: 'test',
+    password_match: 'Test12345',
+    phone_number: 11111111,
     last_name: 'test',
+    first_name: 'test',
+    street: 'test 123',
     city: 'beja'
   },
-  withExistingPhoneNumber: {
-    password_match: 'Test12345',
-    email: 'test2@mail.com',
-    phone_number: 11111111,
-    profession: 'Engineer',
+  clientWithExistingPhoneNumber: {
     password: 'Test12345',
-    first_name: 'test',
+    password_match: 'Test12345',
+    phone_number: 11111111,
     last_name: 'test',
-    city: 'beja'
+    first_name: 'test',
+    street: 'test 123',
+    city: 'beja',
+    email: 'test2@mail.com'
   },
 
-  withExistingEmail: {
-    password_match: 'Test12345',
-    email: 'test1@mail.com',
-    profession: 'Engineer',
-    phone_number: 22222222,
+  clientWithExistingEmail: {
     password: 'Test12345',
-    first_name: 'test',
+    password_match: 'Test12345',
     last_name: 'test',
-    city: 'beja'
+    first_name: 'test',
+    street: 'test 123',
+    city: 'beja',
+    email: 'test1@mail.com',
+    phone_number: 22222222
   },
-  resetLinkToken: 'sdlkfqskfqfdfqksljfskljdflskdf',
+  resetLinkToken: 'sdlkfqskfqsljflksl',
   jwtTestToken: '',
   fakeJwtToken:
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImZvbyI6ImJhciJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.5QQ3YuRVOuoNHoAQNscvjHbR9Fg5D8TpENDSqGu-Yrg'
@@ -49,7 +49,7 @@ const employeeTestData = {
 
 // ****************************************************
 
-describe('Employee Auth', () => {
+describe('Client Auth', () => {
   let server: http.Server;
 
   beforeAll(async () => {
@@ -57,37 +57,37 @@ describe('Employee Auth', () => {
     prisma.$connect();
 
     // create fake user to test for user login
-    await prisma.employee.create({
+    await prisma.client.create({
       data: {
-        password: hashPassword('Test12345'),
+        id: 'user-1',
         email: 'test1@mail.com',
-        profession: 'Engineer',
+        password: hashPassword('Test12345'),
         phone_number: 11111111,
-        still_employed: true,
-        first_name: 'test',
         last_name: 'test',
-        id: 'user-1'
+        first_name: 'test',
+        street: 'test 123',
+        city: 'beja'
       }
     });
 
     // create session to test user password reset link
-    await redisClient.set(employeeTestData.resetLinkToken, 'test1@mail.com');
+    await redisClient.set(clientTestData.resetLinkToken, 'test1@mail.com');
 
     // create fake session to test for user sign out
     const sessionKey = await redisClient.set(
       '1111',
       JSON.stringify({
+        id: 'user-1',
         email: 'test1@mail.com',
         phone_number: 11111111,
-        street: 'test 123',
-        first_name: 'test',
         last_name: 'test',
-        id: 'user-1',
+        first_name: 'test',
+        street: 'test 123',
         city: 'beja'
       })
     );
 
-    employeeTestData.jwtTestToken = jwt.sign(
+    clientTestData.jwtTestToken = jwt.sign(
       { sessionKey },
       process.env.JWT_SECRET
     );
@@ -98,10 +98,10 @@ describe('Employee Auth', () => {
   describe('sign up', () => {
     it('should return missing fields', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/signup')
+        .post('/api/v1/auth/client/signup?user=client')
         .send({
           last_name: 'test',
-          first_name: 'user'
+          street: 'some street'
         })
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
@@ -113,8 +113,8 @@ describe('Employee Auth', () => {
 
     it('should return email is taken', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/signup')
-        .send(employeeTestData.withExistingEmail)
+        .post('/api/v1/auth/client/signup?user=client')
+        .send(clientTestData.clientWithExistingEmail)
         .expect(StatusCodes.CONFLICT)
         .then(res => {
           expect(res.body).toMatchObject({
@@ -125,8 +125,8 @@ describe('Employee Auth', () => {
 
     it('should return phone number is taken', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/signup')
-        .send(employeeTestData.withExistingPhoneNumber)
+        .post('/api/v1/auth/client/signup?user=client')
+        .send(clientTestData.clientWithExistingPhoneNumber)
         .expect(StatusCodes.CONFLICT)
         .then(res => {
           expect(res.body).toMatchObject({
@@ -137,9 +137,9 @@ describe('Employee Auth', () => {
 
     it('should sign client up', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/signup')
+        .post('/api/v1/auth/client/signup?user=client')
         .send({
-          ...employeeTestData.formData,
+          ...clientTestData.clientFormData,
           email: 'test2@mail.com',
           phone_number: 12345678
         })
@@ -154,7 +154,7 @@ describe('Employee Auth', () => {
     // invalid form data
     it('should return invalid form data', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/signin')
+        .post('/api/v1/auth/client/signin?user=client')
         .send({ email: 'test1@mail.com', password: 'invalid password' })
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
@@ -167,7 +167,7 @@ describe('Employee Auth', () => {
     // non existing email
     it('should check for non existing email', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/signin')
+        .post('/api/v1/auth/client/signin?user=client')
         .send({ email: 'wrongEmail@mail.com', password: 'Testing12345' })
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
@@ -180,7 +180,7 @@ describe('Employee Auth', () => {
     // test for wrong password
     it('should check for wrong password', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/signin')
+        .post('/api/v1/auth/client/signin?user=client')
         .send({ email: 'test1@mail.com', password: 'WrongPassword123' })
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
@@ -193,7 +193,7 @@ describe('Employee Auth', () => {
     // signin success
     it('should return sign in success', () => {
       return request(server)
-        .post('/api/v1/auth/employee/signin')
+        .post('/api/v1/auth/client/signin?user=client')
         .send({ email: 'test1@mail.com', password: 'Test12345' })
         .expect(200);
     });
@@ -203,7 +203,7 @@ describe('Employee Auth', () => {
     // no jwt token
     it('check for non existing jwt', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/signout')
+        .post('/api/v1/auth/client/signout?user=client')
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
           expect(res.body).toMatchObject({
@@ -215,8 +215,8 @@ describe('Employee Auth', () => {
     // unvalid jwt token
     it('should sign user out', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/signout')
-        .set('Cookie', [`jwt=${employeeTestData.fakeJwtToken}`])
+        .post('/api/v1/auth/client/signout?user=client')
+        .set('Cookie', [`jwt=${clientTestData.fakeJwtToken}`])
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
           expect(res.body).toMatchObject({
@@ -228,9 +228,9 @@ describe('Employee Auth', () => {
     // signed out successfully
     it('should return signed out successfully ', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/signout')
-        .set('Cookie', [`jwt=${employeeTestData.jwtTestToken}`])
-        .expect(StatusCodes.BAD_REQUEST)
+        .post('/api/v1/auth/client/signout')
+        .set('Cookie', [`jwt=${clientTestData.jwtTestToken}`])
+        .expect(StatusCodes.OK)
         .then(res => {
           expect(res.body).toMatchObject({
             data: 'signed out successfully'
@@ -242,7 +242,7 @@ describe('Employee Auth', () => {
   describe('reset link', () => {
     it('should return missing email', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/link')
+        .post('/api/v1/auth/client/link?user=client')
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
           expect(res.body).toMatchObject({
@@ -253,7 +253,7 @@ describe('Employee Auth', () => {
 
     it('should return no user with such email', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/link')
+        .post('/api/v1/auth/client/link?user=client')
         .send({ email: 'invlidmail@gmail.com' })
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
@@ -265,7 +265,7 @@ describe('Employee Auth', () => {
 
     it('should return OK', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/link')
+        .post('/api/v1/auth/client/link?user=client')
         .send({ email: 'test1@mail.com' })
         .expect(StatusCodes.OK);
     }, 20000);
@@ -274,7 +274,7 @@ describe('Employee Auth', () => {
   describe('reset password', () => {
     it('should return missing reset token', async () => {
       return request(server)
-        .get('/api/v1/auth/employee/reset')
+        .get('/api/v1/auth/client/reset?user=client')
         .expect(StatusCodes.UNAUTHORIZED)
         .then(res => {
           expect(res.body).toMatchObject({
@@ -285,7 +285,7 @@ describe('Employee Auth', () => {
 
     it('should return missing password', async () => {
       return request(server)
-        .get('/api/v1/auth/employee/reset?token=jfsldjfkskldfjlsdk')
+        .get('/api/v1/auth/client/reset?user=client&token=jfsldjfkskldfjlsdk')
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
           expect(res.body).toMatchObject({
@@ -296,9 +296,7 @@ describe('Employee Auth', () => {
 
     it('should return OK', async () => {
       return request(server)
-        .get(
-          `/api/v1/auth/employee/reset?token=${employeeTestData.resetLinkToken}`
-        )
+        .get(`/api/v1/auth/client/reset?user=client&token=${clientTestData.resetLinkToken}`)
         .send({ password: 'someNewPassword123' })
         .expect(StatusCodes.OK)
         .then(res => {
@@ -310,8 +308,8 @@ describe('Employee Auth', () => {
   });
 
   afterAll(async () => {
-    await prisma.employee.deleteMany({ where: { email: 'test1@mail.com' } });
-    await prisma.employee.deleteMany({ where: { email: 'test2@mail.com' } });
+    await prisma.client.deleteMany({ where: { email: 'test1@mail.com' } });
+    await prisma.client.deleteMany({ where: { email: 'test2@mail.com' } });
     await redisClient.disconnect();
     await prisma.$disconnect();
     server.close();

@@ -1,6 +1,6 @@
 import type { JestConfigWithTsJest } from 'ts-jest';
 const jestConfing: JestConfigWithTsJest = {
-  roots: ['src'],
+  roots: ['tests'],
   moduleFileExtensions: ['js', 'ts'],
   extensionsToTreatAsEsm: ['.ts'],
   preset: 'ts-jest',

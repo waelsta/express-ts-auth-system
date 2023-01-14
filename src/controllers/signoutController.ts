@@ -1,7 +1,7 @@
 import { RedisCommandArgument } from '@redis/client/dist/lib/commands';
 import { CustomError } from '../middlewares/errorHandler';
 import { NextFunction, Request, Response } from 'express';
-import redisClient from '../utils/redis.connect';
+import redisClient from '../services/redis.connect';
 import { StatusCodes } from 'http-status-codes';
 import { IjwtPayload } from '../types/types';
 import jwt from 'jsonwebtoken';
@@ -12,7 +12,6 @@ export const signout = async (
   next: NextFunction
 ) => {
   const token = req.cookies.jwt;
-  console.log('cookies : ', req.cookies);
   // no token
   if (!token) {
     return next(new CustomError(StatusCodes.BAD_REQUEST, 'please login !'));
