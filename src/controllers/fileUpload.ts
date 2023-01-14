@@ -1,9 +1,9 @@
 import { userMapper, users, UserTypes } from '../utils/userMappr';
 import { NextFunction, Request, Response } from 'express';
 import { CustomError } from '../middlewares/errorHandler';
+import { Client, Employee } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
 import { upload } from '../utils/multerConfig';
-import { Client, Employee } from '@prisma/client';
 
 const uploadPicture = upload.single('profile');
 

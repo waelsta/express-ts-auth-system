@@ -1,4 +1,4 @@
-import prisma from '../utils/prisma.connect';
+import prisma from '../services/prisma.connect';
 
 // upload Client Image
 export const saveClientPicture = async (

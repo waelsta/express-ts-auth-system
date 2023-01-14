@@ -85,7 +85,6 @@ export const addService = async (
     });
     return res.status(StatusCodes.OK).json(service);
   } catch (err) {
-    console.log(err);
     return next(
       new CustomError(
         StatusCodes.INTERNAL_SERVER_ERROR,

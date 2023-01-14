@@ -19,6 +19,15 @@ export const verifyPassword = (password: string, hash: string) => {
 };
 
 // verfiy jwt token
-
 export const verifyJwtToken = (token: string) =>
   jwt.verify(token, process.env.JWT_SECRET as string);
+
+// sign jwt token
+export const signToken = (sessionKey: string) => {
+  const { JWT_SECRET, SESSION_EXP } = process.env;
+  const token = jwt.sign({ sessionKey }, JWT_SECRET as string, {
+    expiresIn: SESSION_EXP
+  });
+
+  return token;
+};
