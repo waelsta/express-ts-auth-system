@@ -1,9 +1,9 @@
-import { Client, Employee } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
+import redisClient from '../services/redis.connect';
+import { Client, Employee } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
-import { IjwtPayload } from '../types/types';
 import { verifyJwtToken } from '../utils/crypt';
-import redisClient from '../utils/redis.connect';
+import { IjwtPayload } from '../types/types';
 import { CustomError } from './errorHandler';
 
 // middleware to check if user is authenticated

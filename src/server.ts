@@ -1,5 +1,5 @@
-import { connectToDatabase } from './utils/prisma.connect';
-import redisClient from './utils/redis.connect';
+import { connectToDatabase } from './services/prisma.connect';
+import redisClient from './services/redis.connect';
 import * as dotenv from 'dotenv';
 import morgan from 'morgan';
 import app from './app';
