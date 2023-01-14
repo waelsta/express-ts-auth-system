@@ -52,7 +52,6 @@ export const signup = async (
   try {
     await utils.createUser(req.query.user)(req.body);
   } catch (error) {
-    console.log(error);
     return next(
       new CustomError(
         StatusCodes.INTERNAL_SERVER_ERROR,
