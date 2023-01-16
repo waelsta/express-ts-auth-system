@@ -7,7 +7,7 @@ services:
     command: "tail -F someFile" # keep container running
     build:
       context: ./
-      target: dev-bind
+      target: dev-bind-test
     environment:
       - ENV=DEVELOPMENT
       - TEST=TRUE

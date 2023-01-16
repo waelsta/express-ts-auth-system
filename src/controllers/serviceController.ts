@@ -95,7 +95,6 @@ export const addService = async (
 };
 
 // delete serivce
-// get service by id
 export const removeService = async (
   req: Request<{ serviceId: string }>,
   res: Response,

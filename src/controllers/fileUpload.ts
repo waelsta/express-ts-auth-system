@@ -9,12 +9,12 @@ const uploadPicture = upload.single('profile');
 
 export const uploadProfilePic = async (
   req: Request,
-  res: Response<any, { userData: Client | Employee }>,
+  res: Response<any, { user: Client | Employee }>,
   next: NextFunction
 ) => {
   uploadPicture(req, res, err => {
     // get user type , user id and image name
-    const userId = res.locals.userData.id;
+    const userId = res.locals.user?.id;
     const userRole = req.query.user as UserTypes;
     const pictureFileName = req.file?.filename as string;
 
