@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { corsOptions, credentials } from './utils/corsConfig';
 import { ErrorHandler } from './middlewares/errorHandler';
+import serviceRouter from './routes/serviceRouter';
 import uploadsRouter from './routes/uploadsRouter';
 import clientRouter from './routes/clientRouter';
 import authRouter from './routes/authRouter';
@@ -8,7 +9,6 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import cors from 'cors';
-import serviceRouter from './routes/serviceRouter';
 
 const app = express();
 // middlewares
