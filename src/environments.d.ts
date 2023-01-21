@@ -13,9 +13,4 @@ declare global {
       PROFILE_PICTURES_FOLDER: string;
     }
   }
-  namespace Express {
-    interface Request {
-      userId: string;
-    }
-  }
 }

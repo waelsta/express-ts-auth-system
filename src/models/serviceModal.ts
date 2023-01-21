@@ -1,4 +1,3 @@
-import { randomUUID } from 'crypto';
 import { Service } from '@prisma/client';
 import prisma from '../services/prisma.connect';
 

@@ -1,8 +1,10 @@
-// import { getEmployeeData } from '../controllers/employee/employeeController';
-// import express from 'express';
+import { getemployee, getData } from '../controllers/employeeController';
+import { checkAuth } from '../middlewares/authHandler';
+import express from 'express';
 
-// const employeeRouter = express.Router();
+const employeeRouter = express.Router();
 
-// employeeRouter.get('/', getEmployeeData);
+employeeRouter.get('/', checkAuth, getData);
+employeeRouter.get('/:employeeId', getemployee);
 
-// export default employeeRouter;
+export default employeeRouter;
