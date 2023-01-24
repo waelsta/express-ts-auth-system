@@ -97,7 +97,7 @@ describe('Employee Auth', () => {
   describe('sign up', () => {
     it('should return missing fields', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/signup?user=employee')
+        .post('/api/v1/auth/signup?user=employee')
         .send({
           last_name: 'test',
           first_name: 'user'
@@ -112,7 +112,7 @@ describe('Employee Auth', () => {
 
     it('should return email is taken', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/signup?user=employee')
+        .post('/api/v1/auth/signup?user=employee')
         .send(employeeTestData.withExistingEmail)
         .expect(StatusCodes.CONFLICT)
         .then(res => {
@@ -124,7 +124,7 @@ describe('Employee Auth', () => {
 
     it('should return phone number is taken', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/signup?user=employee')
+        .post('/api/v1/auth/signup?user=employee')
         .send(employeeTestData.withExistingPhoneNumber)
         .expect(StatusCodes.CONFLICT)
         .then(res => {
@@ -136,7 +136,7 @@ describe('Employee Auth', () => {
 
     it('should sign client up', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/signup?user=employee')
+        .post('/api/v1/auth/signup?user=employee')
         .send({
           ...employeeTestData.formData,
           email: 'test2@mail.com',
@@ -153,7 +153,7 @@ describe('Employee Auth', () => {
     // invalid form data
     it('should return invalid form data', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/signin?user=employee')
+        .post('/api/v1/auth/signin?user=employee')
         .send({ email: 'test1@mail.com', password: 'invalid password' })
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
@@ -166,7 +166,7 @@ describe('Employee Auth', () => {
     // non existing email
     it('should check for non existing email', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/signin?user=employee')
+        .post('/api/v1/auth/signin?user=employee')
         .send({ email: 'wrongEmail@mail.com', password: 'Testing12345' })
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
@@ -179,7 +179,7 @@ describe('Employee Auth', () => {
     // test for wrong password
     it('should check for wrong password', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/signin?user=employee')
+        .post('/api/v1/auth/signin?user=employee')
         .send({ email: 'test1@mail.com', password: 'WrongPassword123' })
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
@@ -192,7 +192,7 @@ describe('Employee Auth', () => {
     // signin success
     it('should return sign in success', () => {
       return request(server)
-        .post('/api/v1/auth/employee/signin?user=employee')
+        .post('/api/v1/auth/signin?user=employee')
         .send({ email: 'test1@mail.com', password: 'Test12345' })
         .expect(200);
     });
@@ -202,7 +202,7 @@ describe('Employee Auth', () => {
     // no jwt token
     it('check for non existing jwt', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/signout?user=employee')
+        .post('/api/v1/auth/signout?user=employee')
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
           expect(res.body).toMatchObject({
@@ -214,7 +214,7 @@ describe('Employee Auth', () => {
     // unvalid jwt token
     it('should return session already expired', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/signout?user=employee')
+        .post('/api/v1/auth/signout?user=employee')
         .set('Cookie', [`jwt=${employeeTestData.fakeJwtToken}`])
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
@@ -227,7 +227,7 @@ describe('Employee Auth', () => {
     // signed out successfully
     it('should return signed out successfully ', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/signout?user=employee')
+        .post('/api/v1/auth/signout?user=employee')
         .set('Cookie', [`jwt=${employeeTestData.jwtTestToken}`])
         .expect(StatusCodes.OK)
         .then(res => {
@@ -241,7 +241,7 @@ describe('Employee Auth', () => {
   describe('reset link', () => {
     it('should return missing email', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/link?user=employee')
+        .post('/api/v1/auth/link?user=employee')
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
           expect(res.body).toMatchObject({
@@ -252,7 +252,7 @@ describe('Employee Auth', () => {
 
     it('should return no user with such email', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/link?user=employee')
+        .post('/api/v1/auth/link?user=employee')
         .send({ email: 'invlidmail@gmail.com' })
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
@@ -264,7 +264,7 @@ describe('Employee Auth', () => {
 
     it('should return OK', async () => {
       return request(server)
-        .post('/api/v1/auth/employee/link?user=employee')
+        .post('/api/v1/auth/link?user=employee')
         .send({ email: 'test1@mail.com' })
         .expect(StatusCodes.OK);
     }, 20000);
@@ -273,7 +273,7 @@ describe('Employee Auth', () => {
   describe('reset password', () => {
     it('should return missing reset token', async () => {
       return request(server)
-        .get('/api/v1/auth/employee/reset?user=employee')
+        .get('/api/v1/auth/reset?user=employee')
         .expect(StatusCodes.UNAUTHORIZED)
         .then(res => {
           expect(res.body).toMatchObject({
@@ -285,7 +285,7 @@ describe('Employee Auth', () => {
     it('should return missing password', async () => {
       return request(server)
         .get(
-          '/api/v1/auth/employee/reset?user=employee&token=jfsldjfkskldfjlsdk'
+          '/api/v1/auth/reset?user=employee&token=jfsldjfkskldfjlsdk'
         )
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
@@ -298,7 +298,7 @@ describe('Employee Auth', () => {
     it('should return OK', async () => {
       return request(server)
         .get(
-          `/api/v1/auth/employee/reset?user=employee&token=${employeeTestData.resetLinkToken}`
+          `/api/v1/auth/reset?user=employee&token=${employeeTestData.resetLinkToken}`
         )
         .send({ password: 'someNewPassword123' })
         .expect(StatusCodes.OK)
