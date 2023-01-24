@@ -98,7 +98,7 @@ describe('Client Auth', () => {
   describe('sign up', () => {
     it('should return missing fields', async () => {
       return request(server)
-        .post('/api/v1/auth/client/signup?user=client')
+        .post('/api/v1/auth/signup?user=client')
         .send({
           last_name: 'test',
           street: 'some street'
@@ -113,7 +113,7 @@ describe('Client Auth', () => {
 
     it('should return email is taken', async () => {
       return request(server)
-        .post('/api/v1/auth/client/signup?user=client')
+        .post('/api/v1/auth/signup?user=client')
         .send(clientTestData.clientWithExistingEmail)
         .expect(StatusCodes.CONFLICT)
         .then(res => {
@@ -125,7 +125,7 @@ describe('Client Auth', () => {
 
     it('should return phone number is taken', async () => {
       return request(server)
-        .post('/api/v1/auth/client/signup?user=client')
+        .post('/api/v1/auth/signup?user=client')
         .send(clientTestData.clientWithExistingPhoneNumber)
         .expect(StatusCodes.CONFLICT)
         .then(res => {
@@ -137,7 +137,7 @@ describe('Client Auth', () => {
 
     it('should sign client up', async () => {
       return request(server)
-        .post('/api/v1/auth/client/signup?user=client')
+        .post('/api/v1/auth/signup?user=client')
         .send({
           ...clientTestData.clientFormData,
           email: 'test2@mail.com',
@@ -154,7 +154,7 @@ describe('Client Auth', () => {
     // invalid form data
     it('should return invalid form data', async () => {
       return request(server)
-        .post('/api/v1/auth/client/signin?user=client')
+        .post('/api/v1/auth/signin?user=client')
         .send({ email: 'test1@mail.com', password: 'invalid password' })
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
@@ -167,7 +167,7 @@ describe('Client Auth', () => {
     // non existing email
     it('should check for non existing email', async () => {
       return request(server)
-        .post('/api/v1/auth/client/signin?user=client')
+        .post('/api/v1/auth/signin?user=client')
         .send({ email: 'wrongEmail@mail.com', password: 'Testing12345' })
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
@@ -180,7 +180,7 @@ describe('Client Auth', () => {
     // test for wrong password
     it('should check for wrong password', async () => {
       return request(server)
-        .post('/api/v1/auth/client/signin?user=client')
+        .post('/api/v1/auth/signin?user=client')
         .send({ email: 'test1@mail.com', password: 'WrongPassword123' })
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
@@ -193,7 +193,7 @@ describe('Client Auth', () => {
     // signin success
     it('should return sign in success', () => {
       return request(server)
-        .post('/api/v1/auth/client/signin?user=client')
+        .post('/api/v1/auth/signin?user=client')
         .send({ email: 'test1@mail.com', password: 'Test12345' })
         .expect(200);
     });
@@ -203,7 +203,7 @@ describe('Client Auth', () => {
     // no jwt token
     it('check for non existing jwt', async () => {
       return request(server)
-        .post('/api/v1/auth/client/signout?user=client')
+        .post('/api/v1/auth/signout?user=client')
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
           expect(res.body).toMatchObject({
@@ -215,7 +215,7 @@ describe('Client Auth', () => {
     // unvalid jwt token
     it('should sign user out', async () => {
       return request(server)
-        .post('/api/v1/auth/client/signout?user=client')
+        .post('/api/v1/auth/signout?user=client')
         .set('Cookie', [`jwt=${clientTestData.fakeJwtToken}`])
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
@@ -228,7 +228,7 @@ describe('Client Auth', () => {
     // signed out successfully
     it('should return signed out successfully ', async () => {
       return request(server)
-        .post('/api/v1/auth/client/signout')
+        .post('/api/v1/auth/signout')
         .set('Cookie', [`jwt=${clientTestData.jwtTestToken}`])
         .expect(StatusCodes.OK)
         .then(res => {
@@ -242,7 +242,7 @@ describe('Client Auth', () => {
   describe('reset link', () => {
     it('should return missing email', async () => {
       return request(server)
-        .post('/api/v1/auth/client/link?user=client')
+        .post('/api/v1/auth/link?user=client')
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
           expect(res.body).toMatchObject({
@@ -253,7 +253,7 @@ describe('Client Auth', () => {
 
     it('should return no user with such email', async () => {
       return request(server)
-        .post('/api/v1/auth/client/link?user=client')
+        .post('/api/v1/auth/link?user=client')
         .send({ email: 'invlidmail@gmail.com' })
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
@@ -265,7 +265,7 @@ describe('Client Auth', () => {
 
     it('should return OK', async () => {
       return request(server)
-        .post('/api/v1/auth/client/link?user=client')
+        .post('/api/v1/auth/link?user=client')
         .send({ email: 'test1@mail.com' })
         .expect(StatusCodes.OK);
     }, 20000);
@@ -274,7 +274,7 @@ describe('Client Auth', () => {
   describe('reset password', () => {
     it('should return missing reset token', async () => {
       return request(server)
-        .get('/api/v1/auth/client/reset?user=client')
+        .get('/api/v1/auth/reset?user=client')
         .expect(StatusCodes.UNAUTHORIZED)
         .then(res => {
           expect(res.body).toMatchObject({
@@ -285,7 +285,7 @@ describe('Client Auth', () => {
 
     it('should return missing password', async () => {
       return request(server)
-        .get('/api/v1/auth/client/reset?user=client&token=jfsldjfkskldfjlsdk')
+        .get('/api/v1/auth/reset?user=client&token=jfsldjfkskldfjlsdk')
         .expect(StatusCodes.BAD_REQUEST)
         .then(res => {
           expect(res.body).toMatchObject({
@@ -296,7 +296,7 @@ describe('Client Auth', () => {
 
     it('should return OK', async () => {
       return request(server)
-        .get(`/api/v1/auth/client/reset?user=client&token=${clientTestData.resetLinkToken}`)
+        .get(`/api/v1/auth/reset?user=client&token=${clientTestData.resetLinkToken}`)
         .send({ password: 'someNewPassword123' })
         .expect(StatusCodes.OK)
         .then(res => {
