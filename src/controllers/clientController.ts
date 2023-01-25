@@ -7,10 +7,10 @@ import { CustomError } from '../middlewares/errorHandler';
 // get client data
 export const getData = async (
   req: Request,
-  res: Response<any, { userData: Client | Employee }>,
+  res: Response<any, { user: Client | Employee }>,
   next: NextFunction
 ) => {
-  const client = res.locals.userData;
+  const client = res.locals.user;
   return res.status(StatusCodes.OK).send(client);
 };
 
